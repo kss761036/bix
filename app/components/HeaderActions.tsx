@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import LineButton from "@/app/components/LineButton";
 
 export default function HeaderActions() {
   const router = useRouter();
   const [userName, setUserName] = useState<string>("-");
   const [userEmail, setUserEmail] = useState<string>("-");
+  const [open, setOpen] = useState(false);
 
   const decodeJwtPayload = (token: string) => {
     try {
@@ -59,12 +64,32 @@ export default function HeaderActions() {
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <span className="text-xs font-semibold text-[#161616] leading-tight">
-        <span className="block">{userName}</span>
-        <span className="block text-[#6a6258]">{userEmail}</span>
-      </span>
+      <LineButton onClick={() => setOpen(true)}>내정보</LineButton>
       <LineButton href="/boards/new">글쓰기</LineButton>
       <LineButton onClick={handleLogout}>로그아웃</LineButton>
+
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>내정보</DialogTitle>
+        <DialogContent>
+          <div className="flex flex-col gap-2 text-sm text-[#161616]">
+            <div className="flex items-center gap-3">
+              <span className="w-14 text-xs font-semibold text-[#6a6258]">
+                이름
+              </span>
+              <span className="text-sm">{userName}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-14 text-xs font-semibold text-[#6a6258]">
+                이메일
+              </span>
+              <span className="text-sm">{userEmail}</span>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <LineButton onClick={() => setOpen(false)}>닫기</LineButton>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
