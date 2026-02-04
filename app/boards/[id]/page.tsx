@@ -60,6 +60,7 @@ export default function BoardDetailPage() {
   const [detail, setDetail] = useState<BoardDetail | null>(null);
   const [categoryMap, setCategoryMap] = useState<CategoryMap>({});
   const [status, setStatus] = useState("로딩 중...");
+  const [actionStatus, setActionStatus] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -116,6 +117,27 @@ export default function BoardDetailPage() {
     return `${MEDIA_BASE_URL}${url}`;
   };
 
+  const handleDelete = async () => {
+    if (!id) return;
+    const confirmed = window.confirm("정말 삭제할까요?");
+    if (!confirmed) return;
+
+    setActionStatus("삭제 중...");
+    try {
+      const res = await apiFetch(`${DETAIL_URL}/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        setActionStatus(`삭제에 실패했습니다. (HTTP ${res.status})`);
+        return;
+      }
+      setActionStatus("");
+      router.push(`/?page=${listPage}`);
+    } catch {
+      setActionStatus("네트워크 오류가 발생했습니다.");
+    }
+  };
+
   if (!detail) {
     return (
       <div className="min-h-screen bg-[#f6f1e8] text-[#161616]">
@@ -143,7 +165,11 @@ export default function BoardDetailPage() {
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-16 pt-12">
         <header className="flex items-center justify-between border-b border-[#2f2a24]/20 pb-6">
           <h1 className="text-2xl font-semibold md:text-3xl">게시글</h1>
-          <LineButton href={`/?page=${listPage}`}>목록</LineButton>
+          <div className="flex items-center gap-2">
+            <LineButton href={`/boards/${id}/edit`}>수정</LineButton>
+            <LineButton onClick={handleDelete}>삭제</LineButton>
+            <LineButton href={`/?page=${listPage}`}>목록</LineButton>
+          </div>
         </header>
 
         <section className="flex flex-col gap-6 text-sm">
@@ -168,6 +194,11 @@ export default function BoardDetailPage() {
               alt=""
               className="h-auto max-w-full w-auto self-start object-contain"
             />
+          )}
+          {actionStatus && (
+            <p className="text-xs text-[#6a6258]" role="status">
+              {actionStatus}
+            </p>
           )}
         </section>
       </main>
