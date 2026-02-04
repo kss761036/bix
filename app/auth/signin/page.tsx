@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/app/lib/api";
 
 type FieldErrors = {
   username?: string;
@@ -94,7 +95,7 @@ export default function SignInPage() {
     setStatus("로그인 요청 중...");
 
     try {
-      const res = await fetch(`${AUTH_BASE_URL}/signin`, {
+      const res = await apiFetch(`${AUTH_BASE_URL}/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
