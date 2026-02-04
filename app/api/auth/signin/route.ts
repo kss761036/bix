@@ -4,6 +4,10 @@ export async function POST(request: Request) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "User-Agent": request.headers.get("user-agent") ?? "Mozilla/5.0",
+      Accept: request.headers.get("accept") ?? "*/*",
+      Origin: request.headers.get("origin") ?? "",
+      Referer: request.headers.get("referer") ?? "",
     },
     body,
   });
