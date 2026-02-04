@@ -1,6 +1,6 @@
 "use client";
 
-const AUTH_BASE_URL = "https://front-mission.bigs.or.kr/auth";
+const AUTH_BASE_URL = "/api/auth";
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 

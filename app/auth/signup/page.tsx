@@ -18,7 +18,7 @@ type SignUpResponse = {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-const AUTH_BASE_URL = "https://front-mission.bigs.or.kr/auth";
+const AUTH_BASE_URL = "/api/auth";
 
 function pickErrorMessage(errorBody: unknown) {
   if (!errorBody || typeof errorBody !== "object") return null;
