@@ -90,13 +90,13 @@ export default function BoardListClient() {
         if (!active) return;
 
         if (!postsRes.ok) {
-          if (postsRes.status === 401) {
-            setStatus("로그인이 필요합니다.");
-          } else {
-            setStatus(
-              `글 목록을 불러오지 못했습니다. (HTTP ${postsRes.status})`,
-            );
+          if (postsRes.status === 401 || postsRes.status === 403) {
+            router.replace("/auth/signin");
+            return;
           }
+          setStatus(
+            `글 목록을 불러오지 못했습니다. (HTTP ${postsRes.status})`,
+          );
           setPosts([]);
           setImageMap({});
           setTotalPages(1);

@@ -18,7 +18,7 @@ export default function AuthRefreshGate() {
       refreshAccessToken().catch(() => {
         // ignore refresh errors during background refresh
       });
-    }, 10 * 60 * 1000);
+    }, 3 * 60 * 1000);
 
     return () => {
       window.clearInterval(interval);
