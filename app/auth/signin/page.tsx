@@ -1,18 +1,63 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FieldErrors = {
   username?: string;
   password?: string;
 };
 
+type SignInResponse = {
+  accessToken?: string;
+  refreshToken?: string;
+};
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+const AUTH_BASE_URL = "https://front-mission.bigs.or.kr/auth";
+
+function pickErrorMessage(errorBody: unknown) {
+  if (!errorBody || typeof errorBody !== "object") return null;
+  const body = errorBody as Record<string, unknown>;
+  const direct =
+    body.message ?? body.error ?? body.detail ?? body.statusMessage ?? null;
+  if (typeof direct === "string") return direct;
+
+  for (const value of Object.values(body)) {
+    if (Array.isArray(value) && value.length > 0) {
+      const first = value[0];
+      if (typeof first === "string") return first;
+    }
+  }
+  return null;
+}
+
+function readToken(key: string) {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(key);
+}
+
+function writeToken(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, value);
+}
+
+async function parseJsonSafe(response: Response) {
+  const text = await response.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
 
 export default function SignInPage() {
+  const router = useRouter();
   const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [status, setStatus] = useState("");
 
   const validate = (next = values) => {
     const nextErrors: FieldErrors = {};
@@ -42,10 +87,43 @@ export default function SignInPage() {
       validate(next);
     };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) return;
+    setStatus("로그인 요청 중...");
+
+    try {
+      const res = await fetch(`${AUTH_BASE_URL}/signin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+        }),
+      });
+
+      if (!res.ok) {
+        let message = `로그인에 실패했습니다. (HTTP ${res.status})`;
+        const errorBody = await parseJsonSafe(res);
+        const detail = pickErrorMessage(errorBody);
+        if (detail) message = detail;
+        setStatus(message);
+        return;
+      }
+
+      const payload = (await parseJsonSafe(res)) as SignInResponse | null;
+      if (payload?.accessToken) writeToken("accessToken", payload.accessToken);
+      if (payload?.refreshToken) writeToken("refreshToken", payload.refreshToken);
+
+      setStatus("로그인 완료");
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+      setStatus("네트워크 오류가 발생했습니다. 연결 상태를 확인하세요.");
+    }
   };
 
   return (
@@ -98,6 +176,11 @@ export default function SignInPage() {
           >
             로그인
           </button>
+          {status && (
+            <p className="text-xs text-[#6a6258]" role="status">
+              {status}
+            </p>
+          )}
         </form>
       </main>
     </div>

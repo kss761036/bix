@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FieldErrors = {
   username?: string;
@@ -9,10 +10,48 @@ type FieldErrors = {
   confirmPassword?: string;
 };
 
+type SignUpResponse = {
+  accessToken?: string;
+  refreshToken?: string;
+};
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+const AUTH_BASE_URL = "https://front-mission.bigs.or.kr/auth";
+
+function pickErrorMessage(errorBody: unknown) {
+  if (!errorBody || typeof errorBody !== "object") return null;
+  const body = errorBody as Record<string, unknown>;
+  const direct =
+    body.message ?? body.error ?? body.detail ?? body.statusMessage ?? null;
+  if (typeof direct === "string") return direct;
+
+  for (const value of Object.values(body)) {
+    if (Array.isArray(value) && value.length > 0) {
+      const first = value[0];
+      if (typeof first === "string") return first;
+    }
+  }
+  return null;
+}
+
+function writeToken(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, value);
+}
+
+async function parseJsonSafe(response: Response) {
+  const text = await response.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [values, setValues] = useState({
     username: "",
     name: "",
@@ -20,6 +59,7 @@ export default function SignUpPage() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [status, setStatus] = useState("");
 
   const validate = (next = values) => {
     const nextErrors: FieldErrors = {};
@@ -37,7 +77,8 @@ export default function SignUpPage() {
     if (!next.password) {
       nextErrors.password = "비밀번호를 입력하세요.";
     } else if (!PASSWORD_REGEX.test(next.password)) {
-      nextErrors.password = "8자 이상, 영문/숫자/특수문자 조합이어야 합니다.";
+      nextErrors.password =
+        "8자 이상, 영문/숫자/특수문자 조합이어야 합니다.";
     }
 
     if (!next.confirmPassword) {
@@ -58,10 +99,49 @@ export default function SignUpPage() {
       validate(next);
     };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) return;
+    setStatus("회원가입 요청 중...");
+
+    try {
+      const res = await fetch(`${AUTH_BASE_URL}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: values.username,
+          name: values.name,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+        }),
+      });
+
+      if (!res.ok) {
+        let message = `회원가입에 실패했습니다. (HTTP ${res.status})`;
+        const errorBody = await parseJsonSafe(res);
+        const detail = pickErrorMessage(errorBody);
+        if (detail) message = detail;
+        setStatus(message);
+        return;
+      }
+
+      const payload = (await parseJsonSafe(res)) as SignUpResponse | null;
+      if (payload?.accessToken) {
+        writeToken("accessToken", payload.accessToken);
+      }
+      if (payload?.refreshToken) {
+        writeToken("refreshToken", payload.refreshToken);
+      }
+
+      setStatus("회원가입 완료");
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error(error);
+      setStatus("네트워크 오류가 발생했습니다. 연결 상태를 확인하세요.");
+    }
   };
 
   return (
@@ -151,6 +231,11 @@ export default function SignUpPage() {
           >
             회원가입
           </button>
+          {status && (
+            <p className="text-xs text-[#6a6258]" role="status">
+              {status}
+            </p>
+          )}
         </form>
       </main>
     </div>
