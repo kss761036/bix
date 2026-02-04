@@ -78,6 +78,13 @@ export default function BoardListClient() {
     let active = true;
 
     const load = async () => {
+      if (typeof window !== "undefined") {
+        const token = window.localStorage.getItem("accessToken");
+        if (!token) {
+          router.replace("/auth/signin");
+          return;
+        }
+      }
       setIsLoading(true);
       try {
         const [postsRes, categoriesRes] = await Promise.all([
