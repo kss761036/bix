@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
+import Image from "next/image";
 
 type BoardDetail = {
   id: number;
@@ -68,7 +69,10 @@ export default function EditBoardPage() {
   });
   const [detail, setDetail] = useState<BoardDetail | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useMemo(() => {
+    if (!file) return null;
+    return URL.createObjectURL(file);
+  }, [file]);
   const [fileError, setFileError] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState("로딩 중...");
@@ -116,14 +120,12 @@ export default function EditBoardPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const validate = (next = values) => {
     const nextErrors: FieldErrors = {};
@@ -326,10 +328,13 @@ export default function EditBoardPage() {
 
           {previewUrl && (
             <div className="overflow-hidden rounded-md border border-[#2f2a24]/20 bg-white">
-              <img
+              <Image
                 src={previewUrl}
                 alt="미리보기"
-                className="h-48 w-full object-contain"
+                width={800}
+                height={600}
+                unoptimized
+                className="h-48 w-auto max-w-full object-contain"
               />
             </div>
           )}
@@ -361,10 +366,13 @@ export default function EditBoardPage() {
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">
               기존 이미지
             </span>
-            <img
+            <Image
               src={resolveImageUrl(detail.imageUrl) ?? ""}
               alt="기존 이미지"
-              className="h-auto max-w-full w-auto self-start object-contain"
+              width={800}
+              height={600}
+              unoptimized
+              className="h-auto w-auto max-w-full self-start object-contain"
             />
           </div>
         )}

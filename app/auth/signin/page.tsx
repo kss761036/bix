@@ -35,11 +35,6 @@ function pickErrorMessage(errorBody: unknown) {
   return null;
 }
 
-function readToken(key: string) {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(key);
-}
-
 function writeToken(key: string, value: string) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(key, value);

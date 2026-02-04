@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
-import Link from "next/link";
 import LineButton from "@/app/components/LineButton";
+import Image from "next/image";
 
 type BoardDetail = {
   id: number;
@@ -189,10 +189,13 @@ export default function BoardDetailPage() {
           </p>
 
           {detail.imageUrl && (
-            <img
+            <Image
               src={resolveImageUrl(detail.imageUrl) ?? ""}
               alt=""
-              className="h-auto max-w-full w-auto self-start object-contain"
+              width={800}
+              height={600}
+              unoptimized
+              className="h-auto w-auto max-w-full self-start object-contain"
             />
           )}
           {actionStatus && (

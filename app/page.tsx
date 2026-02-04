@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import Pagination from "@mui/material/Pagination";
 import HeaderActions from "@/app/components/HeaderActions";
 import { apiFetch } from "@/app/lib/api";
@@ -66,8 +67,10 @@ export default function Home() {
   const [imageMap, setImageMap] = useState<Record<number, string | null>>({});
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const initialPage = Number(searchParams.get("page") ?? "1");
-  const [page, setPage] = useState(Number.isNaN(initialPage) ? 1 : initialPage);
+  const page = useMemo(() => {
+    const value = Number(searchParams.get("page") ?? "1");
+    return Number.isNaN(value) || value < 1 ? 1 : value;
+  }, [searchParams]);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -155,13 +158,6 @@ export default function Home() {
     };
   }, [page]);
 
-  useEffect(() => {
-    const next = Number(searchParams.get("page") ?? "1");
-    if (!Number.isNaN(next) && next !== page) {
-      setPage(next);
-    }
-  }, [searchParams, page]);
-
   const uiPosts: UiPost[] = useMemo(
     () =>
       posts.map((post) => ({
@@ -230,9 +226,12 @@ export default function Home() {
                 <div className="flex min-w-0 flex-col gap-1">
                   <div className="flex min-w-0 items-center gap-3">
                     {post.imageUrl && (
-                      <img
+                      <Image
                         src={resolveImageUrl(post.imageUrl) ?? ""}
                         alt=""
+                        width={32}
+                        height={32}
+                        unoptimized
                         className="h-8 w-8 rounded border border-[#2f2a24]/20 object-cover"
                       />
                     )}
@@ -262,7 +261,6 @@ export default function Home() {
               count={totalPages}
               page={page}
               onChange={(_, value) => {
-                setPage(value);
                 router.replace(`/?page=${value}`);
               }}
               shape="rounded"

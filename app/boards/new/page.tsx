@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
+import Image from "next/image";
 
 type FieldErrors = {
   title?: string;
@@ -52,7 +53,10 @@ export default function NewBoardPage() {
     category: "NOTICE",
   });
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useMemo(() => {
+    if (!file) return null;
+    return URL.createObjectURL(file);
+  }, [file]);
   const [fileError, setFileError] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState("");
@@ -124,18 +128,12 @@ export default function NewBoardPage() {
   };
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-
     return () => {
-      URL.revokeObjectURL(url);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [file]);
+  }, [previewUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;
@@ -257,15 +255,18 @@ export default function NewBoardPage() {
                 <span className="text-xs text-[#ef6a3a]">{fileError}</span>
               )}
             </div>
-            {previewUrl && (
-              <div className="mt-2 overflow-hidden rounded-md border border-[#2f2a24]/20 bg-white">
-                <img
-                  src={previewUrl}
-                  alt="미리보기"
-                  className="h-48 w-full object-contain"
-                />
-              </div>
-            )}
+          {previewUrl && (
+            <div className="mt-2 overflow-hidden rounded-md border border-[#2f2a24]/20 bg-white">
+              <Image
+                src={previewUrl}
+                alt="미리보기"
+                width={800}
+                height={600}
+                unoptimized
+                className="h-48 w-auto max-w-full object-contain"
+              />
+            </div>
+          )}
           </label>
 
           <button
