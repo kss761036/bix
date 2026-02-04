@@ -18,6 +18,9 @@ const API_URL = "https://front-mission.bigs.or.kr/boards";
 const CATEGORY_URL = "https://front-mission.bigs.or.kr/boards/categories";
 const CATEGORY_ORDER = ["NOTICE", "FREE", "QNA", "ETC"];
 
+const EMPTY_POSTS: ApiPost[] = [];
+const EMPTY_CATEGORIES: CategoryMap = {};
+
 function formatDate(value: string) {
   if (!value) return "-";
   const date = new Date(value);
@@ -56,7 +59,7 @@ export default async function Home() {
 
   const [rawPosts, categoryMap] = token
     ? await Promise.all([fetchPosts(token), fetchCategories(token)])
-    : [[], {}];
+    : [EMPTY_POSTS, EMPTY_CATEGORIES];
 
   const categoryLabels = CATEGORY_ORDER.map((key) => categoryMap[key]).filter(
     Boolean,
@@ -76,10 +79,9 @@ export default async function Home() {
           <h1 className="text-2xl font-semibold md:text-3xl">게시판</h1>
         </header>
 
-
         <section className="flex flex-col gap-2 text-sm">
           <div className="grid grid-cols-[80px_1fr_120px] items-center gap-4 border-b border-[#2f2a24]/20 pb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">
-            <span>분류</span>
+            <span>카테고리</span>
             <span>제목</span>
             <span>작성일</span>
           </div>
@@ -105,7 +107,7 @@ export default async function Home() {
             ))
           ) : (
             <div className="border-b border-[#2f2a24]/10 py-6 text-center text-xs text-[#6a6258]">
-              게시글이 없습니다.
+              표시할 글이 없습니다.
             </div>
           )}
         </section>
