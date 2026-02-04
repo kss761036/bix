@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
+import Link from "next/link";
 
 type FieldErrors = {
   username?: string;
@@ -129,7 +130,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-[#f6f1e8] text-[#161616]">
-      <main className="mx-auto flex w-full max-w-lg flex-col gap-8 px-5 pb-20 pt-16">
+      <main className="mx-auto flex w-full max-w-[450px] flex-col gap-8 px-4 pb-20 pt-12 sm:px-5 sm:pt-16">
         <header className="border-b border-[#2f2a24]/20 pb-5">
           <h1 className="text-2xl font-semibold">로그인</h1>
           <p className="mt-2 text-sm text-[#6a6258]">
@@ -183,6 +184,15 @@ export default function SignInPage() {
             </p>
           )}
         </form>
+
+        <div className="flex flex-col gap-3 border-t border-[#2f2a24]/10 pt-4">
+          <Link
+            href="/auth/signup"
+            className="h-11 rounded-md border border-[#2f2a24]/20 px-3 text-center text-sm font-semibold leading-[44px] text-[#161616]"
+          >
+            회원가입
+          </Link>
+        </div>
       </main>
     </div>
   );

@@ -147,7 +147,7 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-[#f6f1e8] text-[#161616]">
-      <main className="mx-auto flex w-full max-w-lg flex-col gap-8 px-5 pb-20 pt-16">
+      <main className="mx-auto flex w-full max-w-[450px] flex-col gap-8 px-4 pb-20 pt-12 sm:px-5 sm:pt-16">
         <header className="border-b border-[#2f2a24]/20 pb-5">
           <h1 className="text-2xl font-semibold">회원가입</h1>
           <p className="mt-2 text-sm text-[#6a6258]">

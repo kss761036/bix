@@ -187,23 +187,23 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#f6f1e8] text-[#161616]">
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 pb-16 pt-12">
+      <main className="mx-auto flex w-full max-w-[768px] flex-col gap-6 px-4 pb-16 pt-10 sm:px-5 sm:pt-12">
         <header className="flex items-center justify-between border-b border-[#2f2a24]/20 pb-6">
           <h1 className="text-2xl font-semibold md:text-3xl">게시판</h1>
           <HeaderActions />
         </header>
 
         <section className="flex flex-col text-sm">
-          <div className="grid grid-cols-[80px_1fr_140px] items-center gap-4 border-b border-[#2f2a24]/20 pb-6 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">
+          <div className="grid items-center border-b border-[#2f2a24]/20 pb-6 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258] min-[601px]:grid-cols-[80px_1fr_140px] max-[600px]:grid-cols-[64px_1fr] min-[601px]:gap-4 max-[600px]:gap-3">
             <span className="text-center">카테고리</span>
             <span className="text-center">제목</span>
-            <span className="text-center">작성일</span>
+            <span className="hidden text-center min-[601px]:block">작성일</span>
           </div>
           {isLoading ? (
             skeletonRows.map((row) => (
               <div
                 key={row}
-                className="grid grid-cols-[80px_1fr_140px] items-center gap-4 border-b border-[#2f2a24]/10 py-3"
+                className="grid items-center border-b border-[#2f2a24]/10 py-3 min-[601px]:grid-cols-[80px_1fr_140px] max-[600px]:grid-cols-[64px_1fr] min-[601px]:gap-4 max-[600px]:gap-3"
               >
                 <div className="flex justify-center">
                   <div className="h-3 w-12 animate-pulse rounded bg-[#2f2a24]/10" />
@@ -212,7 +212,7 @@ export default function Home() {
                   <div className="h-8 w-8 animate-pulse rounded border border-[#2f2a24]/10 bg-[#2f2a24]/10" />
                   <div className="h-3 w-40 animate-pulse rounded bg-[#2f2a24]/10" />
                 </div>
-                <div className="flex justify-center">
+                <div className="hidden justify-center min-[601px]:flex">
                   <div className="h-3 w-20 animate-pulse rounded bg-[#2f2a24]/10" />
                 </div>
               </div>
@@ -222,24 +222,29 @@ export default function Home() {
               <Link
                 key={post.id}
                 href={`/boards/${post.id}?page=${page}`}
-                className="grid grid-cols-[80px_1fr_140px] items-center gap-4 border-b border-[#2f2a24]/10 px-2 py-3 transition hover:bg-[#f2f2f2]"
+                className="grid items-center border-b border-[#2f2a24]/10 px-2 py-3 transition hover:bg-[#f2f2f2] min-[601px]:grid-cols-[80px_1fr_140px] max-[600px]:grid-cols-[64px_1fr] min-[601px]:gap-4 max-[600px]:gap-3"
               >
                 <span className="text-center text-xs font-semibold text-[#161616]">
                   {post.categoryLabel}
                 </span>
-                <div className="flex min-w-0 items-center gap-3">
-                  {post.imageUrl && (
-                    <img
-                      src={resolveImageUrl(post.imageUrl) ?? ""}
-                      alt=""
-                      className="h-8 w-8 rounded border border-[#2f2a24]/20 object-cover"
-                    />
-                  )}
-                  <span className="truncate text-sm font-medium text-[#161616]">
-                    {post.title}
+                <div className="flex min-w-0 flex-col gap-1">
+                  <div className="flex min-w-0 items-center gap-3">
+                    {post.imageUrl && (
+                      <img
+                        src={resolveImageUrl(post.imageUrl) ?? ""}
+                        alt=""
+                        className="h-8 w-8 rounded border border-[#2f2a24]/20 object-cover"
+                      />
+                    )}
+                    <span className="truncate text-sm font-medium text-[#161616]">
+                      {post.title}
+                    </span>
+                  </div>
+                  <span className="text-xs text-[#6a6258] min-[601px]:hidden">
+                    {post.date}
                   </span>
                 </div>
-                <span className="text-center text-xs text-[#6a6258]">
+                <span className="hidden text-center text-xs text-[#6a6258] min-[601px]:block">
                   {post.date}
                 </span>
               </Link>

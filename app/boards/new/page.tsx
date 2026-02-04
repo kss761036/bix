@@ -171,7 +171,7 @@ export default function NewBoardPage() {
 
   return (
     <div className="min-h-screen bg-[#f6f1e8] text-[#161616]">
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-16 pt-12">
+      <main className="mx-auto flex w-full max-w-[768px] flex-col gap-6 px-4 pb-16 pt-10 sm:px-5 sm:pt-12">
         <header className="border-b border-[#2f2a24]/20 pb-6">
           <h1 className="text-2xl font-semibold md:text-3xl">글쓰기</h1>
         </header>
