@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -59,7 +57,7 @@ async function parseJsonSafe(response: Response) {
   }
 }
 
-export default function Home() {
+function BoardListPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<ApiPost[]>([]);
@@ -270,5 +268,13 @@ export default function Home() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <BoardListPage />
+    </Suspense>
   );
 }
