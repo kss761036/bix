@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
 import Link from "next/link";
 
@@ -54,31 +54,30 @@ async function parseJsonSafe(response: Response) {
 
 export default function SignInPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    if (searchParams.get("signup") === "success") {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("signup") === "success") {
       setStatus("회원가입이 완료되었습니다. 로그인해주세요.");
     }
-  }, [searchParams]);
+  }, []);
 
   const validate = (next = values) => {
     const nextErrors: FieldErrors = {};
 
     if (!next.username) {
-      nextErrors.username = "이메일을 입력하세요.";
+      nextErrors.username = "이메일을 입력해주세요.";
     } else if (!EMAIL_REGEX.test(next.username)) {
       nextErrors.username = "이메일 형식이 올바르지 않습니다.";
     }
 
     if (!next.password) {
-      nextErrors.password = "비밀번호를 입력하세요.";
+      nextErrors.password = "비밀번호를 입력해주세요.";
     } else if (!PASSWORD_REGEX.test(next.password)) {
-      nextErrors.password =
-        "8자 이상, 영문/숫자/특수문자 조합이어야 합니다.";
+      nextErrors.password = "8자 이상, 영문/숫자/특수문자 조합이어야 합니다.";
     }
 
     setErrors(nextErrors);
@@ -128,7 +127,7 @@ export default function SignInPage() {
       router.push("/");
     } catch (error) {
       console.error(error);
-      setStatus("네트워크 오류가 발생했습니다. 연결 상태를 확인하세요.");
+      setStatus("네트워크 오류가 발생했습니다. 연결 상태를 확인해주세요.");
     }
   };
 
@@ -137,16 +136,12 @@ export default function SignInPage() {
       <main className="mx-auto flex w-full max-w-[450px] flex-col gap-8 px-4 pb-20 pt-12 sm:px-5 sm:pt-16">
         <header className="border-b border-[#2f2a24]/20 pb-5">
           <h1 className="text-2xl font-semibold">로그인</h1>
-          <p className="mt-2 text-sm text-[#6a6258]">
-            이메일과 비밀번호로 로그인합니다.
-          </p>
+          <p className="mt-2 text-sm text-[#6a6258]">이메일과 비밀번호로 로그인합니다.</p>
         </header>
 
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           <label className="flex flex-col gap-2 text-sm">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">
-              이메일
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">이메일</span>
             <input
               type="email"
               name="username"
@@ -155,15 +150,11 @@ export default function SignInPage() {
               placeholder="example@gmail.com"
               className="h-11 rounded-md border border-[#2f2a24]/20 bg-transparent px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#161616]/40"
             />
-            {errors.username && (
-              <span className="text-xs text-[#ef6a3a]">{errors.username}</span>
-            )}
+            {errors.username && <span className="text-xs text-[#ef6a3a]">{errors.username}</span>}
           </label>
 
           <label className="flex flex-col gap-2 text-sm">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">
-              비밀번호
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6a6258]">비밀번호</span>
             <input
               type="password"
               name="password"
@@ -171,9 +162,7 @@ export default function SignInPage() {
               onChange={handleChange("password")}
               className="h-11 rounded-md border border-[#2f2a24]/20 bg-transparent px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#161616]/40"
             />
-            {errors.password && (
-              <span className="text-xs text-[#ef6a3a]">{errors.password}</span>
-            )}
+            {errors.password && <span className="text-xs text-[#ef6a3a]">{errors.password}</span>}
           </label>
 
           <button
