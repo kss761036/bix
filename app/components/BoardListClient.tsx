@@ -164,7 +164,7 @@ export default function BoardListClient() {
     return () => {
       active = false;
     };
-  }, [page]);
+  }, [page, router]);
 
   const uiPosts: UiPost[] = useMemo(
     () =>
