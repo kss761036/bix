@@ -61,7 +61,7 @@ export default function BoardDetailPage() {
 
   const [detail, setDetail] = useState<BoardDetail | null>(null);
   const [categoryMap, setCategoryMap] = useState<CategoryMap>({});
-  const [status, setStatus] = useState("로딩 중...");
+  const [status, setStatus] = useState("");
   const [actionStatus, setActionStatus] = useState("");
 
   useEffect(() => {
@@ -154,8 +154,22 @@ export default function BoardDetailPage() {
               뒤로
             </button>
           </header>
-          <div className="border-b border-[#2f2a24]/10 py-6 text-center text-xs text-[#6a6258]">
-            {status}
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3 border-b border-[#2f2a24]/10 pb-4">
+              <div className="h-8 w-2/3 animate-pulse rounded bg-[#2f2a24]/10" />
+              <div className="h-4 w-40 animate-pulse rounded bg-[#2f2a24]/10" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="h-4 w-full animate-pulse rounded bg-[#2f2a24]/10" />
+              <div className="h-4 w-full animate-pulse rounded bg-[#2f2a24]/10" />
+              <div className="h-4 w-5/6 animate-pulse rounded bg-[#2f2a24]/10" />
+              <div className="h-4 w-4/6 animate-pulse rounded bg-[#2f2a24]/10" />
+            </div>
+            {status && (
+              <p className="text-xs text-[#6a6258]" role="status">
+                {status}
+              </p>
+            )}
           </div>
         </main>
       </div>
