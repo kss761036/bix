@@ -140,7 +140,7 @@ export default function SignUpPage() {
       }
 
       setStatus("회원가입 완료");
-      router.push("/auth/signin");
+      router.push("/auth/signin?signup=success");
     } catch (error) {
       console.error(error);
       setStatus("네트워크 오류가 발생했습니다. 연결 상태를 확인하세요.");

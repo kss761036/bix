@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
 import Link from "next/link";
 
@@ -54,9 +54,16 @@ async function parseJsonSafe(response: Response) {
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("signup") === "success") {
+      setStatus("회원가입이 완료되었습니다. 로그인해주세요.");
+    }
+  }, [searchParams]);
 
   const validate = (next = values) => {
     const nextErrors: FieldErrors = {};
