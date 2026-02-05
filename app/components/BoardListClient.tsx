@@ -26,9 +26,11 @@ type UiPost = {
 
 type CategoryMap = Record<string, string>;
 
-const API_URL = "https://front-mission.bigs.or.kr/boards";
-const CATEGORY_URL = "https://front-mission.bigs.or.kr/boards/categories";
-const MEDIA_BASE_URL = "https://front-mission.bigs.or.kr";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://front-mission.bigs.or.kr";
+const API_URL = `${API_BASE_URL}/boards`;
+const CATEGORY_URL = `${API_BASE_URL}/boards/categories`;
+const MEDIA_BASE_URL = API_BASE_URL;
 const PAGE_SIZE = 10;
 const CATEGORY_LABELS: CategoryMap = {
   NOTICE: "공지",

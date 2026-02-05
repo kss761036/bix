@@ -11,7 +11,9 @@ type FieldErrors = {
   category?: string;
 };
 
-const BOARD_URL = "https://front-mission.bigs.or.kr/boards";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://front-mission.bigs.or.kr";
+const BOARD_URL = `${API_BASE_URL}/boards`;
 const CATEGORY_OPTIONS = [
   { value: "NOTICE", label: "공지" },
   { value: "FREE", label: "자유" },

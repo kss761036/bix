@@ -18,7 +18,9 @@ type SignUpResponse = {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-const AUTH_BASE_URL = "/api/auth";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://front-mission.bigs.or.kr";
+const AUTH_BASE_URL = `${API_BASE_URL}/auth`;
 
 function pickErrorMessage(errorBody: unknown) {
   if (!errorBody || typeof errorBody !== "object") return null;

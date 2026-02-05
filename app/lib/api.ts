@@ -1,6 +1,10 @@
 "use client";
 
-const AUTH_BASE_URL = "/api/auth";
+import axios, { type AxiosRequestConfig } from "axios";
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://front-mission.bigs.or.kr";
+const AUTH_BASE_URL = `${API_BASE_URL}/auth`;
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 
@@ -24,11 +28,54 @@ async function parseJsonSafe(response: Response) {
   }
 }
 
+function getUrl(input: RequestInfo | URL) {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.toString();
+  return input.url;
+}
+
+function toResponseFromAxios(
+  status: number,
+  data: unknown,
+  headers: Record<string, string>,
+) {
+  const text =
+    typeof data === "string"
+      ? data
+      : data == null
+        ? ""
+        : JSON.stringify(data);
+  return new Response(text, { status, headers });
+}
+
+async function axiosRequest(input: RequestInfo | URL, init: RequestInit = {}) {
+  const headers = Object.fromEntries(new Headers(init.headers).entries());
+  const config: AxiosRequestConfig = {
+    url: getUrl(input),
+    method: (init.method ?? "GET") as AxiosRequestConfig["method"],
+    headers,
+    data: init.body,
+    withCredentials: false,
+    responseType: "text",
+    transformResponse: [(v) => v],
+    validateStatus: () => true,
+  };
+
+  const res = await axios.request(config);
+  const responseHeaders: Record<string, string> = {};
+  Object.entries(res.headers ?? {}).forEach(([k, v]) => {
+    if (Array.isArray(v)) responseHeaders[k] = v.join(", ");
+    else if (typeof v === "string") responseHeaders[k] = v;
+  });
+
+  return toResponseFromAxios(res.status, res.data, responseHeaders);
+}
+
 export async function refreshAccessToken() {
   const refreshToken = readToken(REFRESH_TOKEN_KEY);
   if (!refreshToken) return null;
 
-  const refreshResponse = await fetch(`${AUTH_BASE_URL}/refresh`, {
+  const refreshResponse = await axiosRequest(`${AUTH_BASE_URL}/refresh`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,12 +105,7 @@ export async function refreshAccessToken() {
 }
 
 function isAuthEndpoint(input: RequestInfo | URL) {
-  const url =
-    typeof input === "string"
-      ? input
-      : input instanceof URL
-        ? input.toString()
-        : input.url;
+  const url = getUrl(input);
   return url.includes("/auth/");
 }
 
@@ -72,7 +114,7 @@ export async function apiFetch(
   init: RequestInit = {},
 ) {
   if (isAuthEndpoint(input)) {
-    return fetch(input, init);
+    return axiosRequest(input, init);
   }
 
   const headers = new Headers(init.headers);
@@ -81,12 +123,12 @@ export async function apiFetch(
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(input, { ...init, headers });
+  const response = await axiosRequest(input, { ...init, headers });
   if (response.status !== 401) return response;
 
   const newAccessToken = await refreshAccessToken();
   if (!newAccessToken) return response;
   headers.set("Authorization", `Bearer ${newAccessToken}`);
 
-  return fetch(input, { ...init, headers });
+  return axiosRequest(input, { ...init, headers });
 }
