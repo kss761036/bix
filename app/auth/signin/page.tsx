@@ -171,6 +171,21 @@ export default function SignInPage() {
           >
             로그인
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              const next = {
+                username: "test12300@gmail.com",
+                password: "test123!@#",
+              };
+              setValues(next);
+              validate(next);
+              setStatus("");
+            }}
+            className="h-11 rounded-md border border-[#2f2a24]/20 bg-transparent text-sm font-semibold text-[#161616]"
+          >
+            테스트 계정
+          </button>
           {status && (
             <p className="text-xs text-[#6a6258]" role="status">
               {status}
