@@ -184,7 +184,7 @@ export default function SignInPage() {
             }}
             className="h-11 rounded-md border border-[#2f2a24]/20 bg-transparent text-sm font-semibold text-[#161616]"
           >
-            테스트 계정
+            테스트 계정 자동입력
           </button>
           {status && (
             <p className="text-xs text-[#6a6258]" role="status">
@@ -205,3 +205,4 @@ export default function SignInPage() {
     </div>
   );
 }
+
